@@ -1,6 +1,6 @@
 # REACT TodoList
 
-![Alt text](Capture.JPG)
+![Alt text](AlirezasTodo.JPG)
 
 A simple To-Do List application built with React and TypeScript.
 It supports adding, deleting, and completing tasks, with all data saved in LocalStorage.
