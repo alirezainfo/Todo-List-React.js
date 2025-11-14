@@ -6,6 +6,7 @@ import "./App.css";
 function App() {
   const [todos, setTodos] = useState<todo[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
+  const [filterValue, setFilterValue] = useState<string>("10");
 
   function addToDoFunc() {
     if (!inputValue.trim()) return;
@@ -38,25 +39,25 @@ function App() {
 
       localStorage.setItem("Todos", JSON.stringify(updated));
 
-      setTodos(updated)
+      setTodos(updated);
     }
   }
 
-  function toggleComplete(id: number){
-    const data = localStorage.getItem("Todos")
-    if(data){
-      const saved = JSON.parse(data)
+  function toggleComplete(id: number) {
+    const data = localStorage.getItem("Todos");
+    if (data) {
+      const saved = JSON.parse(data);
 
-      const updated = saved.map((item:{id: number, completed: boolean})=>{
-        if(item.id === id){
-          return {...item, completed: !item.completed}
+      const updated = saved.map((item: { id: number; completed: boolean }) => {
+        if (item.id === id) {
+          return { ...item, completed: !item.completed };
         }
-        return item
-      })
+        return item;
+      });
 
-      localStorage.setItem("Todos", JSON.stringify(updated))
+      localStorage.setItem("Todos", JSON.stringify(updated));
 
-      setTodos(updated)
+      setTodos(updated);
     }
   }
 
@@ -82,75 +83,95 @@ function App() {
 
   return (
     <>
-      <h1 className="text-gray-900 text-center mt-20">Alireza's To-Do List</h1>
+      <h1 className="text-gray-900 text-center  font-bold text-3xl  mt-20">
+        Alireza's To-Do List
+      </h1>
 
       <div className="mx-25 my-10 flex justify-between items-center">
         <div className="flex justify-between items-center gap-2">
           <input
             id="todoInput"
-            className="border"
+            className="border w-[300px] border-gray-300 outline-0 p-2"
             type="text"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
             }}
           />
-          <button onClick={addToDoFunc}>Create</button>
+          <button
+            className="px-2 pt-2 pb-1 bg-gray-900 text-white hover:text-black hover:bg-white hover:border-gray-300 hover:border transition-all"
+            onClick={addToDoFunc}
+          >
+            Create
+          </button>
         </div>
-        <div>
-          <select name="" id="">
-            <option value="">گزینه ی مورد نظر را انتخاب کنید.</option>
-            <option value="">2</option>
-            <option value="">3</option>
+        <div className="flex justify-center items-center gap-2">
+          <p className="text-gray-800">Filters:</p>
+          <select
+            onChange={(e) => setFilterValue(e.target.value)}
+            className="text-gray-700 border border-gray-300 p-1"
+            name=""
+            id=""
+          >
+            <option value="10">10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
           </select>
         </div>
       </div>
 
-      <div id="todoItems" className="">
+      <div id="todoItems" className="my-5">
         <ul className="mx-25 flex justify-between items-center flex-wrap gap-1.5">
-          {todos.slice(0, 10).map((todo) => (
+          {todos.slice(0, Number(filterValue)).map((todo) => (
             <li
               key={todo.id}
               className="w-[350px] gap-0.5 h-20 px-2 border border-gray-300 flex justify-between items-center"
             >
-              <p className={todo.completed ? 'pb-1 line-through text-gray-500' : 'pb-1'}>{todo.title}</p>
+              <p
+                className={
+                  todo.completed
+                    ? "pb-1 line-through text-gray-500"
+                    : "pb-1 text-gray-700"
+                }
+              >
+                {todo.title}
+              </p>
               <div className="flex justify-center items-center gap-1">
-          {
-            todo.completed ?
-                <svg
-                onClick={()=>toggleComplete(todo.id)}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-check-check-icon lucide-check-check"
-                >
-                  <path d="M18 6 7 17l-5-5" />
-                  <path d="m22 10-7.5 7.5L13 16" />
-                </svg>
-                :
-                <svg
-                  onClick={()=>toggleComplete(todo.id)}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-check-icon lucide-check"
-                >
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-          }
-                
+                {todo.completed ? (
+                  <svg
+                    onClick={() => toggleComplete(todo.id)}
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-check-check-icon lucide-check-check"
+                  >
+                    <path d="M18 6 7 17l-5-5" />
+                    <path d="m22 10-7.5 7.5L13 16" />
+                  </svg>
+                ) : (
+                  <svg
+                    onClick={() => toggleComplete(todo.id)}
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-check-icon lucide-check"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                )}
+
                 <svg
                   onClick={() => deleteHandle(todo.id)}
                   xmlns="http://www.w3.org/2000/svg"
