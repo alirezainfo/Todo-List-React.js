@@ -7,45 +7,71 @@ function App() {
   const [todos, setTodos] = useState<todo[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
 
-  
-function addToDoFunc() {
-  
-  if (!inputValue.trim()) return;
+  function addToDoFunc() {
+    if (!inputValue.trim()) return;
 
-  setTodos((prevTodos) => {
-    const newTodos = [
+    setTodos((prevTodos) => {
+      const newTodos = [
+        {
+          userId: 1,
+          id: prevTodos.length + 1,
+          title: inputValue,
+          completed: false,
+        },
+        ...prevTodos,
+      ];
 
-      {
-      userId: 1,
-      id: prevTodos.length+1,
-      title: inputValue,
-      completed: false,
-    },
-    ...prevTodos
-      
-    ]
+      localStorage.setItem("Todos", JSON.stringify(newTodos));
+      return newTodos;
+    });
 
-    localStorage.setItem("Todos",JSON.stringify(newTodos))
-    return newTodos;
-});
+    setInputValue("");
+  }
 
-  setInputValue("");
-}
+  function deleteHandle(id: number) {
+    const data = localStorage.getItem("Todos");
 
+    if (data) {
+      const saved = JSON.parse(data);
+
+      const updated = saved.filter((item: { id: number }) => item.id !== id);
+
+      localStorage.setItem("Todos", JSON.stringify(updated));
+
+      setTodos(updated)
+    }
+  }
+
+  function toggleComplete(id: number){
+    const data = localStorage.getItem("Todos")
+    if(data){
+      const saved = JSON.parse(data)
+
+      const updated = saved.map((item:{id: number, completed: boolean})=>{
+        if(item.id === id){
+          return {...item, completed: !item.completed}
+        }
+        return item
+      })
+
+      localStorage.setItem("Todos", JSON.stringify(updated))
+
+      setTodos(updated)
+    }
+  }
 
   useEffect(() => {
     const fetchTodo = async () => {
       try {
         const saved = localStorage.getItem("Todos");
 
-        if(saved){
-        setTodos(JSON.parse(saved))
-        }else{
+        if (saved) {
+          setTodos(JSON.parse(saved));
+        } else {
           const data = await getTodo();
-          localStorage.setItem("Todos", JSON.stringify(data))
+          localStorage.setItem("Todos", JSON.stringify(data));
           setTodos(data);
         }
-        
       } catch (err: any) {
       } finally {
       }
@@ -60,7 +86,15 @@ function addToDoFunc() {
 
       <div className="mx-25 my-10 flex justify-between items-center">
         <div className="flex justify-between items-center gap-2">
-          <input id="todoInput" className="border" type="text" value={inputValue} onChange={(e)=>{setInputValue(e.target.value)}} />
+          <input
+            id="todoInput"
+            className="border"
+            type="text"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+            }}
+          />
           <button onClick={addToDoFunc}>Create</button>
         </div>
         <div>
@@ -75,24 +109,16 @@ function addToDoFunc() {
       <div id="todoItems" className="">
         <ul className="mx-25 flex justify-between items-center flex-wrap gap-1.5">
           {todos.slice(0, 10).map((todo) => (
-            <li key={todo.id} className="w-[350px] h-20 px-2 border border-gray-300 flex justify-between items-center">
-              <p className="">{todo.title}</p>
+            <li
+              key={todo.id}
+              className="w-[350px] gap-0.5 h-20 px-2 border border-gray-300 flex justify-between items-center"
+            >
+              <p className={todo.completed ? 'pb-1 line-through text-gray-500' : 'pb-1'}>{todo.title}</p>
               <div className="flex justify-center items-center gap-1">
+          {
+            todo.completed ?
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-check-icon lucide-check"
-                >
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-                <svg
+                onClick={()=>toggleComplete(todo.id)}
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
@@ -107,7 +133,9 @@ function addToDoFunc() {
                   <path d="M18 6 7 17l-5-5" />
                   <path d="m22 10-7.5 7.5L13 16" />
                 </svg>
+                :
                 <svg
+                  onClick={()=>toggleComplete(todo.id)}
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
@@ -117,7 +145,24 @@ function addToDoFunc() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="lucide lucide-trash2-icon lucide-trash-2"
+                  className="lucide lucide-check-icon lucide-check"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+          }
+                
+                <svg
+                  onClick={() => deleteHandle(todo.id)}
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-trash2-icon lucide-trash-2 text-red-500"
                 >
                   <path d="M10 11v6" />
                   <path d="M14 11v6" />
